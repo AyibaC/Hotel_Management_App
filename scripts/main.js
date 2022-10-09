@@ -37,8 +37,8 @@ class Room {
         if (typeof lastName !== "string") {
             throw new Error(
             `The last name of a guest must be a string. Received ${lastName} (of type ${typeof lastName})`)}
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = firstName.trim();
+        this.lastName = lastName.trim();
         this.sizeDesired = sizeDesired;
         this.creditCardNumber = Guest.uuidv4();
         this.roomNumber = 0;
@@ -91,7 +91,7 @@ class Room {
         return this.rooms.find((room) => room.number === number);
         }
         getGuest({firstName, lastName, creditCardNumber}){
-        return this.guests.find((existingGuest)=>existingGuest.firstName === firstName && existingGuest.lastName === lastName && existingGuest.creditCardNumber === creditCardNumber)
+        return this.guests.find((existingGuest)=>existingGuest.firstName === firstName.trim() && existingGuest.lastName === lastName.trim() && existingGuest.creditCardNumber === creditCardNumber)
         }
         getRoomsForGuest(guest){
         const availableRooms = this.rooms.filter(room => room.size === guest.sizeDesired && room.isOccupied === false);
@@ -136,7 +136,10 @@ class Room {
         if(room.number === guest.roomNumber){
             console.log('room number:', room.number, 'guest number:', guest.roomNumber, 'room type:', typeof(room.number), 'guest type:', typeof(guest.roomNumber))
             room.isOccupied = false;
-            room.occupant = null;
+            room.occupant = {
+                name: null,
+                creditCardNumber: null
+            };
             guest.roomNumber = 0;
             return 'Check out successful'+ room
         } else {
@@ -220,47 +223,83 @@ class Room {
     
     const noRooms = document.getElementById('no-rooms-message');
 
+    const addRoom = document.querySelector('.add-room-accord');
+    const removeRoom = document.querySelector('.remove-room-accord');
+    const updateRoom = document.querySelector('.update-room-accord');
+    
+
+    function renderViewTab(roomList){
+        if(Array.isArray(roomList) && roomList.length){
+            viewContent.innerHTML = ``;
+            for (const room of roomList){
+                console.log(room);
+                const tile = document.createElement("div");
+                const tileWrapper = document.createElement("div");
+                tileWrapper.classList.add("tile-wrapper");
+                viewContent.appendChild(tileWrapper);
+                const roomTile = tileWrapper.appendChild(tile);
+                roomTile.classList.add("uk-card", "uk-card-primary", "uk-card-body")
+                roomTile.innerHTML = `<h3 class="uk-card-title">Room ${room.number}</h3>
+                <h4 class="uk-card-title">${room.size.charAt(0).toUpperCase() + room.size.slice(1)}</h4>
+                <p>${room.isOccupied?"Occupied":"Unoccupied"}</p>`;
+            }
+        } else {
+            viewContent.innerHTML = ``;
+            const message = document.createElement("p");
+            message.id = 'no-rooms-message';
+            message.classList.add("uk-text-center");
+            message.innerHTML = `There are currently no rooms in your hotel. <br><a href="#" uk-switcher-item="3">Click here</a>&nbsp;to add rooms.`
+            viewContent.appendChild(document.createElement("div"));
+            viewContent.appendChild(message);
+            viewContent.appendChild(document.createElement("div"));
+            checkInTab.classList.add("uk-disabled");
+            checkOutTab.classList.add("uk-disabled");
+            removeRoom.classList.add("uk-disabled");
+            updateRoom.classList.add("uk-disabled");
+        }
+    }
 
     document.addEventListener("DOMContentLoaded", (e)=>{
         e.preventDefault();
-        const rooms = ritz.getRooms();
-        for (const {number, size, isOccupied, occupant} of rooms){
-        const tile = document.createElement("div");
-        const tileWrapper = document.createElement("div");
-        tileWrapper.classList.add("tile-wrapper");
-        viewContent.appendChild(tileWrapper);
-        const roomTile = tileWrapper.appendChild(tile);
-        //roomTile.classList.add("tile");
-        roomTile.classList.add("uk-card", "uk-card-primary", "uk-card-body")
-        roomTile.innerHTML = `<h3 class="uk-card-title">Room ${number}</h3>
-        <h4 class="uk-card-title">${size.charAt(0).toUpperCase() + size.slice(1)}</h4>
-        <p>${isOccupied?"Occupied":"Unoccupied"}</p>`;
-        //console.log(roomTile.innerHTML);
-        }
+        renderViewTab(JSON.parse(localStorage.getItem('rooms')));
     });
+
+
+    //enable rest of app when at least one room is added 
+    function enableApp(roomList){
+        if (Array.isArray(roomList) && roomList.length){
+            console.log("room status" ,typeof roomList, roomList.length)
+            checkInTab.removeAttribute("class", "uk-disabled");
+            checkOutTab.removeAttribute("class", "uk-disabled");
+            if(addRoom){addRoom.removeAttribute("class", "uk-open")};
+            if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
+            if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
+        } 
+    };
+
+    enableApp(JSON.parse(localStorage.getItem('rooms')));
+
+    //disable parts of app if rooms get removed and hotel is empty again 
+    function disableApp(roomList){
+        if (Array.isArray(roomList) && roomList.length==0){
+            console.log("room status" ,typeof roomList, roomList.length)
+            checkInTab.setAttribute("class", "uk-disabled");
+            checkOutTab.setAttribute("class", "uk-disabled");
+            if(addRoom){addRoom.setAttribute("class", "uk-open")};
+            if(removeRoom){removeRoom.setAttribute("class", "uk-disabled")};
+            if(updateRoom){updateRoom.setAttribute("class", "uk-disabled")};
+        } 
+    };
+
+    
+    
     
     viewTab.addEventListener("click", (e)=>{
         e.preventDefault();
-        const rooms = ritz.getRooms();
-        // noRooms.hidden = true;
-        viewContent.innerHTML = ``;
-        for (const {number, size, isOccupied, occupant} of rooms){
-        const tile = document.createElement("div");
-        const tileWrapper = document.createElement("div");
-        tileWrapper.classList.add("tile-wrapper");
-        viewContent.appendChild(tileWrapper);
-        const roomTile = tileWrapper.appendChild(tile);
-        roomTile.classList.add("uk-card", "uk-card-primary", "uk-card-body")
-        roomTile.innerHTML = `<h3 class="uk-card-title">Room ${number}</h3>
-        <h4 class="uk-card-title">${size.charAt(0).toUpperCase() + size.slice(1)}</h4>
-        <p>${isOccupied?"Occupied":"Unoccupied"}</p>`;
-        //console.log(roomTile.innerHTML);
-        }
+        renderViewTab(JSON.parse(localStorage.getItem('rooms')));
     });
     
-    console.log("room status" ,typeof JSON.parse(localStorage.getItem('rooms')));
-    
-    console.log('local storage', JSON.parse(localStorage.getItem('rooms')))
+    //console.log("room status" ,typeof JSON.parse(localStorage.getItem('rooms')));
     
 
   ////CHECK GUEST IN TAB
@@ -286,51 +325,31 @@ class Room {
     const roomOptionsContainer = document.getElementById("room-options-container"); 
 
 
-    function renderRoomOptions(rooms, guest){
+    function renderRoomOptions(roomList, guest){
     roomOptionsContainer.innerHTML = ``; 
     roomOptionsContainer.removeAttribute("class","uk-hidden");
     const search = document.createElement("p");
     const searchedFor = roomOptionsContainer.appendChild(search);
-        searchedFor.innerHTML = `You searched for a ${guest.sizeDesired} for ${guest.firstName} ${guest.lastName}`;
-        for (const room of rooms){
-        if (rooms === []){
-            const message = document.createElement("p");
-            const noRoomMessage = roomOptionsContainer.appendChild(message);
+    searchedFor.innerHTML = `You searched for a ${guest.sizeDesired} for ${guest.firstName} ${guest.lastName}`;
+        if (roomList.length === 0){
+            const noRoomMessage = document.createElement("p");
             noRoomMessage.innerHTML = `Sorry, there are no rooms available fitting your needs`;
-            console.log(roomOptionsContainer.innerHTML);
+            noRoomMessage.classList.add('uk-text-center');
+            roomOptionsContainer.appendChild(noRoomMessage);
+            console.log('room options html', roomOptionsContainer.innerHTML);
         } else {
-        const button = document.createElement("button");
-        const roomButton = roomOptionsContainer.appendChild(button);
-        roomButton.classList.add("uk-button", "uk-button-default", "uk-button-large", "room-button");
-            roomButton.setAttribute("uk-toggle","target: #check-in-modal")
-            roomButton.setAttribute("data-room-number",`${room.number}`)
-            roomButton.setAttribute("data-guest-first-name",`${guest.firstName}`)
-            roomButton.setAttribute("data-guest-last-name",`${guest.lastName}`)
-        roomButton.innerHTML = `Room ${room.number}`}
-    }
+            for (const room of roomList){
+                const button = document.createElement("button");
+                const roomButton = roomOptionsContainer.appendChild(button);
+                roomButton.classList.add("uk-button", "uk-button-default", "uk-button-large", "room-button");
+                    roomButton.setAttribute("uk-toggle","target: #check-in-modal")
+                    roomButton.setAttribute("data-room-number",`${room.number}`)
+                    roomButton.setAttribute("data-guest-first-name",`${guest.firstName}`)
+                    roomButton.setAttribute("data-guest-last-name",`${guest.lastName}`)
+                roomButton.innerHTML = `Room ${room.number}`
+                }
+        }
     }; 
-
-    addGuestForm.addEventListener("submit",(e)=>{
-        e.preventDefault();
-        const guestFormData = new FormData(addGuestForm);
-        const data = Object.fromEntries(guestFormData);
-        const guest = new Guest(data);
-        console.log(guest);   
-    const rooms =  ritz.getRoomsForGuest(guest);
-            console.log(rooms);
-        addGuestForm.reset();
-        renderRoomOptions(rooms, guest);
-        renderModalText();
-        checkGuestIn(guest);
-    });
-
-
-    addGuestForm.addEventListener("reset",(e)=>{
-        e.preventDefault;
-        const roomOptionsContainer = document.getElementById("room-options-container"); 
-        roomOptionsContainer.innerHTML = ``;
-    });
-    
     
     function renderModalText(){const roomButton = document.getElementsByClassName("room-button");
     console.log(roomButton);
@@ -342,6 +361,13 @@ class Room {
         btn.setAttribute("data-room-number",`${button.dataset.roomNumber}`);
     })}};
     
+    const successCheckInModal = document.getElementById('successful-check-in-modal');
+
+    function renderSuccessModalText(guestObj){
+        const p = document.querySelector("#successful-check-in-modal p");
+        p.innerHTML = `Guest successfully checked in. Their credit card number is ${guestObj.creditCardNumber}. Please make a note of this as you will need to check this guest.`
+    };
+
     function checkGuestIn(guest){
         const btn = document.querySelector("#check-in-modal .modal-check-in-button");
         btn.addEventListener("click",(e)=>{
@@ -349,19 +375,46 @@ class Room {
         const room = ritz.getRoomByNumber(Number(btn.dataset.roomNumber));
         ritz.addGuest(guest);
         ritz.checkIn(guest,room);
+        console.log('rooms after check in:', ritz.getRooms());
+        localStorage.setItem('rooms', JSON.stringify(ritz.getRooms()));
         console.log(room);
+        renderSuccessModalText(guest);
+        UIkit.modal(successCheckInModal).show();
         roomOptionsContainer.innerHTML = ``
     })
     };
 
+    addGuestForm.addEventListener("submit",(e)=>{
+        e.preventDefault();
+        const guestFormData = new FormData(addGuestForm);
+        const data = Object.fromEntries(guestFormData);
+        data.firstName = data.firstName.trim();
+        data.lastName = data.lastName.trim();
+        console.log('name after trim', `${data.firstName} ${data.lastName}`);
+        const guest = new Guest(data);
+        console.log(guest);   
+        const roomList =  ritz.getRoomsForGuest(guest);
+        console.log(roomList);
+        addGuestForm.reset();
+        renderRoomOptions(roomList, guest);
+        renderModalText();
+        checkGuestIn(guest);
+    });
+
+
+    addGuestForm.addEventListener("reset",(e)=>{
+        e.preventDefault;
+        const roomOptionsContainer = document.getElementById("room-options-container"); 
+        roomOptionsContainer.innerHTML = ``;
+    });
 
   //CHECK OUT TAB
     checkOutTab.addEventListener('click',(e)=>{
         e.preventDefault();
         const checkOutSelect = document.getElementById('check-out-room-select');
         checkOutSelect.innerHTML = `<option value="">Select Room</option>`;
-        const rooms = ritz.getRooms();
-        const occuppiedRooms = rooms.filter(room => room.isOccupied === true);
+        const roomList = JSON.parse(localStorage.getItem('rooms'));
+        const occuppiedRooms = roomList.filter(room => room.isOccupied === true);
         for (const room of occuppiedRooms){
         const option = document.createElement('option');
         const roomOption = checkOutSelect.appendChild(option); roomOption.setAttribute("value",`${room.number}`);
@@ -372,9 +425,9 @@ class Room {
 
 
     function renderAllRoomOptions(select){
-        const rooms = ritz.getRooms();
+        //const rooms = ritz.getRooms();
         select.innerHTML = `<option value="">Select Room</option>`;
-        for (const room of rooms){
+        for (const room of JSON.parse(localStorage.getItem('rooms'))){
         const option = document.createElement('option');
         const roomOption = select.appendChild(option); roomOption.setAttribute("value",`${room.number}`);
         roomOption.innerHTML = `Room ${room.number}`;
@@ -403,6 +456,8 @@ class Room {
         }
         try {
             ritz.checkOut(guest, room);
+            console.log('rooms after checkout:',ritz.getRooms());
+            localStorage.setItem('rooms', JSON.stringify(ritz.getRooms()));
             UIkit.modal.dialog('<p class="uk-modal-body">Guest successfully checked out.</p>');
         } catch(error){
             console.log('check out error',error.message);
@@ -418,20 +473,20 @@ class Room {
     /////////////////////////EDIT TAB//////////////////////
     const editTab = document.querySelector('.edit-tab');
 
-    editTab.addEventListener('click',(e)=>{
-        //enable rest of app when at least one room is added 
-        if (typeof ritz.rooms !== 'undefined' && ritz.rooms.length > 0){
-            console.log("room status" ,typeof ritz.rooms, ritz.rooms.length)
-            checkInTab.removeAttribute("class", "uk-disabled");
-            checkOutTab.removeAttribute("class", "uk-disabled");
-            const addRoom = document.querySelector('.add-room-accord');
-            const removeRoom = document.querySelector('.remove-room-accord');
-            const updateRoom = document.querySelector('.update-room-accord');
-            if(addRoom){addRoom.removeAttribute("class", "uk-open")};
-            if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
-            if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
-        } 
-    });
+    // editTab.addEventListener('click',(e)=>{
+    //     //enable rest of app when at least one room is added 
+    //     if (typeof ritz.rooms !== 'undefined' && ritz.rooms.length > 0){
+    //         console.log("room status" ,typeof ritz.rooms, ritz.rooms.length)
+    //         checkInTab.removeAttribute("class", "uk-disabled");
+    //         checkOutTab.removeAttribute("class", "uk-disabled");
+    //         const addRoom = document.querySelector('.add-room-accord');
+    //         const removeRoom = document.querySelector('.remove-room-accord');
+    //         const updateRoom = document.querySelector('.update-room-accord');
+    //         if(addRoom){addRoom.removeAttribute("class", "uk-open")};
+    //         if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
+    //         if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
+    //     } 
+    // });
 
 
 
@@ -470,17 +525,7 @@ class Room {
             UIkit.modal.dialog('<p class="uk-modal-body">Room successfully added.</p>');
             addRoomForm.reset();
             //enable rest of app when at least one room is added 
-            if (typeof ritz.rooms !== 'undefined' && ritz.rooms.length > 0){
-                console.log("room status" ,typeof ritz.rooms, ritz.rooms.length)
-                checkInTab.removeAttribute("class", "uk-disabled");
-                checkOutTab.removeAttribute("class", "uk-disabled");
-                const addRoom = document.querySelector('.add-room-accord');
-                const removeRoom = document.querySelector('.remove-room-accord');
-                const updateRoom = document.querySelector('.update-room-accord');
-                if(addRoom){addRoom.removeAttribute("class", "uk-open")};
-                if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
-                if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
-            }; 
+            enableApp(JSON.parse(localStorage.getItem('rooms')));
         }catch(error){
             //console.log(error.message);
             UIkit.modal.alert('Room number already exists. Please choose another room number.')
@@ -496,7 +541,11 @@ class Room {
         const removeData = new FormData(removeRoomForm);
         const data = Object.fromEntries(removeData);
         ritz.removeRoom(Number(data.number));
+        console.log('ritz.rooms after removal:', ritz.rooms)
+        localStorage.setItem('rooms',JSON.stringify(ritz.getRooms()));
+        console.log('local storage after removal:', localStorage.getItem('rooms'));
         removeRoomForm.reset();
+        disableApp(JSON.parse(localStorage.getItem('rooms'))); 
         renderAllRoomOptions(removeSelect);
     });
 
@@ -542,6 +591,7 @@ class Room {
         console.log(data);
         try{
             ritz.changeRoom(data);
+            localStorage.setItem('rooms',JSON.stringify(ritz.getRooms()));
             UIkit.modal.dialog('<p class="uk-modal-body">Room successfully updated</p>')
         } catch(error){
             console.log(error.message);

@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Management App</title>
 
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.21/dist/css/uikit.min.css" />
@@ -19,8 +25,8 @@
     <div class="uk-margin-top uk-margin-left uk-margin-right uk-width-2-3@m uk-margin-auto@m">
         <h1>Hotel Management App</h1>
 
-        <ul uk-tab>
-            <li class="uk-active" id="view-rooms-tab" ><a href="#" class="view-tab">View Rooms</a>
+        <ul class="uk-subnav uk-subnav-pill" uk-switcher>
+            <li id="view-rooms-tab"><a href="#" class="view-tab">View Rooms</a>
             </li>
             <li class="uk-disabled" id="check-guest-in-tab"><a href="#" class="check-in-tab">Check Guest In</a></li>
             <li class="uk-disabled" id="check-guest-out-tab"><a href="#" class="check-out-tab">Check Guest Out</a></li>
@@ -30,9 +36,11 @@
 
         <div class="uk-switcher">
             <div id="view-tab-content" class="uk-grid-small uk-child-width-1-3" uk-grid>
-                <!--     <p class="uk-text-center" id="no-rooms-message">There are currently no rooms in your hotel. <br><a href="#edit-tab">Click here</a>&nbsp;to add rooms.</p> -->
+                <div></div>
+                <p class="uk-text-center" id="no-rooms-message">There are currently no rooms in your hotel. <br><a href="#" uk-switcher-item="3">Click here</a>&nbsp;to add rooms.</p>
+                <div></div>
             </div>
-            <div class="check-in-tab-content">
+            <div class="check-in-tab-content switcher-container">
                 <form id="add-guest-form" class="uk-form-stacked">
                     <div class="uk-margin">
                         <label for="first-name" class="uk-form-label">First Name</label>
@@ -57,13 +65,21 @@
                 </form>
 
                 <div id="room-options-container"></div>
+
+                <div id="successful-check-in-modal" uk-modal>
+                    <div class="uk-modal-dialog uk-modal-body">
+                        <button class="uk-modal-close-default" type="button" uk-close></button>
+                        <h2 class="uk-modal-title">Check in Successful</h2>
+                        <p>Guest successfully checked in. Their credit card number is "...". Please make a note of this as you will need to check this guest.</p>
+                    </div>
+                </div>
                 
                 <div id="check-in-modal" uk-modal>
                     <div class="uk-modal-dialog">
                         <div class="uk-modal-body">
                             <p>Lorem.</p>
                             <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
-                            <button class="uk-button uk-button-primary uk-modal-close modal-check-in-button" id="modal-check-in-button" type="button" onclick="UIkit.notification({message: 'Guest successfully checked in', status: 'success'})">Check In</button>
+                            <button class="uk-button uk-button-primary uk-modal-close modal-check-in-button" id="modal-check-in-button" type="button" >Check In</button>
                         </div>
                     </div>
                 </div> 
@@ -100,7 +116,7 @@
 
 
             <div class="edit-tab-content">
-                <ul uk-accordion>
+                <ul uk-accordion >
                     <li class="uk-open add-room-accord">
                         <a href="#" class="uk-accordion-title">Add Room</a>
                         <div class="uk-accordion-content">
@@ -127,11 +143,11 @@
                     <li class="uk-disabled remove-room-accord">
                         <a href="#" class="uk-accordion-title" id="remove-room-accord">Remove Room</a>
                         <div class="uk-accordion-content">
-                            <form id="remove-room-form">
+                            <form id="remove-room-form" onsubmit="UIkit.notification({message: 'Room successfully removed', status: 'success'})">
                                 <select name="number" id="remove-room-select" class="uk-select uk-margin" required>
                                     <option value="">Select Room</option>
                                 </select>
-                                <button type="submit" class="uk-button uk-button-primary" id="remove-form-submit" onclick="UIkit.notification({message: 'Room successfully removed', status: 'success'})">Remove</button>
+                                <button type="submit" class="uk-button uk-button-primary" id="remove-form-submit" >Remove</button>
                             </form>
                             <!--         <div id="add-room-fail-modal" uk-modal>
                                 <div class="uk-modal-dialog uk-modal-body">
