@@ -95,7 +95,7 @@ class Room {
         }
         getRoomsForGuest(guest){
         const availableRooms = this.rooms.filter(room => room.size === guest.sizeDesired && room.isOccupied === false);
-        if (availableRooms === []){
+        if (!availableRooms){
             return "Sorry, there are no rooms available fitting your needs"
         } else {
             return availableRooms
@@ -355,6 +355,7 @@ class Room {
     console.log(roomButton);
     for (const button of roomButton){
     button.addEventListener("click",(e)=>{
+        e.preventDefault();
         const p = document.querySelector("#check-in-modal p");
         p.innerHTML = `Check guest ${button.dataset.guestFirstName} ${button.dataset.guestLastName} into room ${button.dataset.roomNumber}?`;
         const btn = document.querySelector("#check-in-modal .modal-check-in-button");
@@ -371,7 +372,7 @@ class Room {
     function checkGuestIn(guest){
         const btn = document.querySelector("#check-in-modal .modal-check-in-button");
         btn.addEventListener("click",(e)=>{
-        e.preventDefault;
+        e.preventDefault();
         const room = ritz.getRoomByNumber(Number(btn.dataset.roomNumber));
         ritz.addGuest(guest);
         ritz.checkIn(guest,room);
@@ -403,7 +404,7 @@ class Room {
 
 
     addGuestForm.addEventListener("reset",(e)=>{
-        e.preventDefault;
+        e.preventDefault();
         const roomOptionsContainer = document.getElementById("room-options-container"); 
         roomOptionsContainer.innerHTML = ``;
     });
