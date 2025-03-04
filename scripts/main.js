@@ -223,7 +223,7 @@ class Room {
     
     const noRooms = document.getElementById('no-rooms-message');
 
-    const addRoom = document.querySelector('.add-room-accord');
+    const roomAdd = document.querySelector('.add-room-accord');
     const removeRoom = document.querySelector('.remove-room-accord');
     const updateRoom = document.querySelector('.update-room-accord');
     
@@ -271,7 +271,6 @@ class Room {
             console.log("room status" ,typeof roomList, roomList.length)
             checkInTab.removeAttribute("class", "uk-disabled");
             checkOutTab.removeAttribute("class", "uk-disabled");
-            if(addRoom){addRoom.removeAttribute("class", "uk-open")};
             if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
             if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
         } 
@@ -285,7 +284,7 @@ class Room {
             console.log("room status" ,typeof roomList, roomList.length)
             checkInTab.setAttribute("class", "uk-disabled");
             checkOutTab.setAttribute("class", "uk-disabled");
-            if(addRoom){addRoom.setAttribute("class", "uk-open")};
+            if(roomAdd){roomAdd.setAttribute("class", "uk-open")};
             if(removeRoom){removeRoom.setAttribute("class", "uk-disabled")};
             if(updateRoom){updateRoom.setAttribute("class", "uk-disabled")};
         } 
@@ -480,16 +479,14 @@ class Room {
     //         console.log("room status" ,typeof ritz.rooms, ritz.rooms.length)
     //         checkInTab.removeAttribute("class", "uk-disabled");
     //         checkOutTab.removeAttribute("class", "uk-disabled");
-    //         const addRoom = document.querySelector('.add-room-accord');
+    //         const roomAdd = document.querySelector('.add-room-accord');
     //         const removeRoom = document.querySelector('.remove-room-accord');
     //         const updateRoom = document.querySelector('.update-room-accord');
-    //         if(addRoom){addRoom.removeAttribute("class", "uk-open")};
+    //         if(roomAdd){roomAdd.removeAttribute("class", "uk-open")};
     //         if(removeRoom){removeRoom.removeAttribute("class", "uk-disabled")};
     //         if(updateRoom){updateRoom.removeAttribute("class", "uk-disabled")};
     //     } 
     // });
-
-
 
     const removeRoomAccord = document.getElementById('remove-room-accord');
     
@@ -517,10 +514,9 @@ class Room {
         const newRoomData = new FormData(addRoomForm);
         const data = Object.fromEntries(newRoomData);
         data.number = Number(data.number);
-        const room = new Room(data);
-        console.log('room to add',room);
-        //ritz.addRoom(room);
         try{
+            const room = new Room(data);
+            console.log('room to add',room);
             ritz.addRoom(room);
             localStorage.setItem('rooms',JSON.stringify(ritz.getRooms()));
             UIkit.modal.dialog('<p class="uk-modal-body">Room successfully added.</p>');
@@ -528,8 +524,7 @@ class Room {
             //enable rest of app when at least one room is added 
             enableApp(JSON.parse(localStorage.getItem('rooms')));
         }catch(error){
-            //console.log(error.message);
-            UIkit.modal.alert('Room number already exists. Please choose another room number.')
+            UIkit.modal.alert(error.message);
             addRoomForm.reset();
             throw error;
         }  
