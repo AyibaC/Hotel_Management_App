@@ -32,14 +32,15 @@
             <li class="uk-disabled" id="check-guest-in-tab"><a href="#" class="check-in-tab">Check Guest In</a></li>
             <li class="uk-disabled" id="check-guest-out-tab"><a href="#" class="check-out-tab">Check Guest Out</a></li>
             <li><a href="#" class="edit-tab" >Edit Rooms</a></li>
+            <li><a href="#" class="help-tab" >Help</a></li>
         </ul>
 
 
         <div class="uk-switcher uk-margin-right">
-            <div id="view-tab-content" class="uk-grid-small uk-flex-center " uk-grid>
-                <div></div>
-                <p class="uk-text-center" id="no-rooms-message">There are currently no rooms in your hotel. <br><a href="#" uk-switcher-item="3">Click here</a>&nbsp;to add rooms.</p>
-                <div></div>
+            <div id="view-tab-content" >
+                <div class="uk-flex uk-flex-center">
+                    <p class="uk-text-center" id="no-rooms-message">There are currently no rooms in your hotel. <br><a href="#" uk-switcher-item="3">Click here</a>&nbsp;to add rooms.</p>
+                </div>
             </div>
             <div class="check-in-tab-content switcher-container">
                 <form id="add-guest-form" class="uk-form-stacked">
@@ -187,6 +188,21 @@
                         </div>
                     </li>
                 </ul>
+            </div>
+
+            <div class="help-tab-content">
+                <h2>How to use</h2>
+                <h3>Add Room</h3>
+                <p>To use the app you first have to add rooms by going to the edit rooms tab. There can only be one room with each number. Rooms can now be viewed in the home tab and automatically have an unoccupied status.</p>
+                <h3>Add Guest</h3>
+                <p>Once the hotel has rooms you can add guests. Guests have a first name, last name and a desired room size. Guests can only be checked in to rooms of their desired size. Once the guest is added they will have a credit card number auto generated for them which is printed in the console. Take note of this as it will be needed to check the guest out. The point of this number being generated is to simulate the guest handing over credit card details at the start of their stay. </p>
+                <h3>Check In</h3>
+                <p>To check guests in go to the check in tab. Fill out the name of the guest you wish to check in and click search for rooms. The app will show the list of rooms with the size that the guest requires. Pick one and click check guest in. The pop up that shows after a successful check in will show a unique credit card number for the guest as though the guest provided you with it. Please make a note of this number for when you wish to check the guest out. The room you checked the guest into will now show a status of occupied. </p>
+                <h3>Check Out</h3>
+                <p>To check guests out go to the check guest out tab. Enter the first and last name of your guest and the credit card number. If the credit card number is incorrect you will not be able to check the guest out. This is to simulate a security check to ensure the guest is the actual occupant of the room. </p>
+                <h3>Edit Rooms</h3>
+                <p>You can update and delete rooms in the edit rooms tab but rooms must be unoccupied for you to do so. If the room is occupied check the guest out first and then edit the room. </p>
+
             </div>
 
         </div>

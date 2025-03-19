@@ -197,11 +197,13 @@ const updateRoom = document.querySelector('.update-room-accord');
 function renderViewTab(roomList) {
     if (Array.isArray(roomList) && roomList.length) {
         viewContent.innerHTML = ``;
+        viewContent.classList.add("uk-grid-small");
+        viewContent.setAttribute("uk-grid", true);
         for (const room of roomList) {
             console.log(room);
             const tile = document.createElement("div");
             const tileWrapper = document.createElement("div");
-            tileWrapper.classList.add("tile-wrapper");
+            tileWrapper.classList.add("tile-wrapper", "uk-width-1-2", "uk-width-1-3@s");
             viewContent.appendChild(tileWrapper);
             const roomTile = tileWrapper.appendChild(tile);
             roomTile.classList.add("uk-card", "uk-card-primary", "uk-card-body")
@@ -211,6 +213,8 @@ function renderViewTab(roomList) {
         }
     } else {
         viewContent.innerHTML = ``;
+        viewContent.classList.remove("uk-grid-small");
+        viewContent.removeAttribute("uk-grid");
         const message = document.createElement("p");
         message.id = 'no-rooms-message';
         message.classList.add("uk-text-center");
@@ -250,10 +254,13 @@ enableApp(JSON.parse(localStorage.getItem('rooms')));
 
 //disable parts of app if rooms get removed and hotel is empty again 
 function disableApp(roomList) {
-    if (Array.isArray(roomList) && roomList.length == 0) {
+    if (Array.isArray(roomList) && roomList.length === 0) {
         console.log("room status", typeof roomList, roomList.length)
         checkInTab.setAttribute("class", "uk-disabled");
         checkOutTab.setAttribute("class", "uk-disabled");
+        viewContent.className = '';
+        viewContent.removeAttribute("uk-grid");
+        console.log('view content tab: ', viewContent);
         if (roomAdd) {
             roomAdd.setAttribute("class", "uk-open")
         };
