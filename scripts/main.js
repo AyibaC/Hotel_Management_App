@@ -104,6 +104,7 @@ class Hotel {
     }
     getRoomsForGuest(guest) {
         const availableRooms = this.rooms.filter(room => room.size === guest.sizeDesired && room.isOccupied === false);
+        console.log('availableRooms: ', this.rooms);
         if (!availableRooms) {
             return "Sorry, there are no rooms available fitting your needs"
         } else {
@@ -231,7 +232,10 @@ function renderViewTab(roomList) {
 
 document.addEventListener("DOMContentLoaded", (e) => {
     e.preventDefault();
-    renderViewTab(JSON.parse(localStorage.getItem('rooms')));
+    renderViewTab(ritz.getRooms());
+    //open welcome modal on page refresh
+    const welcomeModal = document.getElementById('welcome-modal');
+    UIkit.modal(welcomeModal).show();
 });
 
 
